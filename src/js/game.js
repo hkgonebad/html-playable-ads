@@ -21,14 +21,21 @@ class ColorwoodGame {
     this.originalWidth = 1215;
     this.originalHeight = 2160;
 
-    // Cube dimensions
-    this.CUBE_WIDTH = 142;
-    this.CUBE_HEIGHT = 163;
+    // Cube dimensions (reduced by 20%)
+    this.CUBE_WIDTH = 114; // 142 * 0.8
+    this.CUBE_HEIGHT = 130; // 163 * 0.8
+
+    // Adjust vertical position from bottom
+    this.BOTTOM_MARGIN = 180; // Distance from bottom of canvas
 
     // Game configuration
     this.PIECES_PER_COLOR = 16;
     this.MAX_STACK_SIZE = 16;
     this.HOLE_COUNT = 7;
+
+    // Magnet effect configuration
+    this.MAGNET_THRESHOLD = 50; // Distance in pixels to trigger magnet effect
+    this.MAGNET_SPEED = 0.2; // Speed of magnetic snap (0-1)
 
     this.tableImage = new Image();
     this.shapeImages = {
@@ -78,13 +85,13 @@ class ColorwoodGame {
 
     // Calculate hole dimensions based on cube size and scale
     const holeWidth = this.CUBE_WIDTH * scale;
-    const holeSpacing = 10 * scale; // Add spacing between holes
+    const holeSpacing = 15 * scale; // Slightly increased spacing
     const totalHolesWidth = this.HOLE_COUNT * holeWidth + (this.HOLE_COUNT - 1) * holeSpacing;
     const startX = (this.canvas.width - totalHolesWidth) / 2;
 
-    // Calculate hole height to accommodate 16 cubes
-    const holeHeight = this.CUBE_HEIGHT * this.MAX_STACK_SIZE * 0.25 * scale; // Stack cubes with 25% overlap
-    const startY = this.canvas.height - holeHeight - 50 * scale;
+    // Calculate hole height to accommodate 16 cubes with adjusted overlap
+    const holeHeight = this.CUBE_HEIGHT * this.MAX_STACK_SIZE * 0.3 * scale; // 30% overlap
+    const startY = this.canvas.height - holeHeight - this.BOTTOM_MARGIN * scale;
 
     // Initialize holes
     this.holes = [];
@@ -178,29 +185,39 @@ class ColorwoodGame {
       hole.shapes.forEach((shape, index) => {
         const img = this.shapeImages[shape.type].img;
         let x = hole.x + (hole.width - shape.width) / 2;
-        let y = hole.y + hole.height - (index + 1) * (shape.height * 0.75);
+        let y = hole.y + hole.height - (index + 1) * (shape.height * 0.7); // Reduced overlap
 
         // If this shape is being dragged, use the dragged position
         if (this.isDragging && holeIndex === this.selectedHoleIndex && index >= hole.shapes.length - this.selectedGroupSize) {
           const dragIndex = index - (hole.shapes.length - this.selectedGroupSize);
-          x = this.dragStartX + this.dragOffsetX;
-          y = this.dragStartY + this.dragOffsetY - dragIndex * shape.height * 0.75;
+
+          // Adjust cursor position to center of shape
+          x = this.dragStartX + this.dragOffsetX - shape.width / 2;
+          y = this.dragStartY + this.dragOffsetY - shape.height / 2 - dragIndex * shape.height * 0.7;
+
+          // Apply magnet effect
+          const nearestHole = this.findNearestValidHole(x + shape.width / 2, y + shape.height / 2);
+          if (nearestHole !== null) {
+            const targetX = nearestHole.x + (nearestHole.width - shape.width) / 2;
+            const targetY = nearestHole.y + nearestHole.height - (nearestHole.shapes.length + dragIndex + 1) * shape.height * 0.7;
+
+            x = x + (targetX - x) * this.MAGNET_SPEED;
+            y = y + (targetY - y) * this.MAGNET_SPEED;
+          }
         }
 
-        // Check if this shape is part of the selected group
-        const isInSelectedGroup = holeIndex === this.selectedHoleIndex && index >= hole.shapes.length - this.selectedGroupSize;
+        // Only highlight if this shape is specifically selected/hovered
+        const isInSelectedGroup = this.isDragging && holeIndex === this.selectedHoleIndex && index >= hole.shapes.length - this.selectedGroupSize;
 
-        // Check if this shape is hoverable (top shape or part of a matching group)
         const isHoverable = this.isShapeSelectable(holeIndex, index);
+        const isHovered = holeIndex === this.hoveredHoleIndex && index === this.hoveredShapeIndex && isHoverable && !this.isDragging;
 
-        // Highlight if hovered and hoverable
-        if (holeIndex === this.hoveredHoleIndex && index === this.hoveredShapeIndex && isHoverable && !this.isDragging) {
+        if (isHovered) {
           this.ctx.save();
           this.ctx.shadowColor = "#ffff00";
           this.ctx.shadowBlur = 15;
         }
 
-        // Highlight if selected
         if (isInSelectedGroup) {
           this.ctx.save();
           this.ctx.shadowColor = "#fff";
@@ -209,7 +226,7 @@ class ColorwoodGame {
 
         this.ctx.drawImage(img, x, y, shape.width, shape.height);
 
-        if ((isInSelectedGroup && !this.isDragging) || (holeIndex === this.hoveredHoleIndex && index === this.hoveredShapeIndex && isHoverable && !this.isDragging)) {
+        if (isHovered || isInSelectedGroup) {
           this.ctx.restore();
         }
       });
@@ -419,6 +436,9 @@ class ColorwoodGame {
       const isComplete = hole.shapes.every((shape) => shape.type === firstType);
 
       if (isComplete) {
+        // Trigger celebration animation
+        this.celebrateCompletion(hole);
+
         // Clear the hole
         hole.shapes = [];
 
@@ -447,6 +467,67 @@ class ColorwoodGame {
     }
 
     return true;
+  }
+
+  findNearestValidHole(x, y) {
+    let nearest = null;
+    let minDistance = this.MAGNET_THRESHOLD;
+
+    this.holes.forEach((hole, index) => {
+      if (this.isValidMove(this.selectedHoleIndex, index)) {
+        const holeX = hole.x + hole.width / 2;
+        const holeY = hole.y + hole.height - hole.shapes.length * this.CUBE_HEIGHT * 0.7 * (this.canvas.width / this.originalWidth);
+        const distance = Math.sqrt(Math.pow(x - holeX, 2) + Math.pow(y - holeY, 2));
+
+        if (distance < minDistance) {
+          minDistance = distance;
+          nearest = hole;
+        }
+      }
+    });
+
+    return nearest;
+  }
+
+  celebrateCompletion(hole) {
+    // Create particle effect
+    const particleCount = 30;
+    const particles = [];
+    const scale = this.canvas.width / this.originalWidth;
+
+    for (let i = 0; i < particleCount; i++) {
+      particles.push({
+        x: hole.x + hole.width / 2,
+        y: hole.y + hole.height / 2,
+        vx: (Math.random() - 0.5) * 10,
+        vy: (Math.random() - 0.5) * 10,
+        radius: Math.random() * 5 * scale + 2 * scale,
+        color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+        alpha: 1,
+      });
+    }
+
+    const animate = () => {
+      particles.forEach((particle) => {
+        particle.x += particle.vx;
+        particle.y += particle.vy;
+        particle.alpha -= 0.02;
+        particle.radius *= 0.99;
+
+        if (particle.alpha > 0) {
+          this.ctx.beginPath();
+          this.ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+          this.ctx.fillStyle = `hsla(${particle.color}, ${particle.alpha})`;
+          this.ctx.fill();
+        }
+      });
+
+      if (particles.some((p) => p.alpha > 0)) {
+        requestAnimationFrame(animate);
+      }
+    };
+
+    animate();
   }
 }
 
