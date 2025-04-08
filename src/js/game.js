@@ -32,10 +32,20 @@ class ColorwoodGame {
     this.PIECES_PER_COLOR = 16;
     this.MAX_STACK_SIZE = 16;
     this.HOLE_COUNT = 7;
+    this.HOLE_SPACING_MULTIPLIER = 1.3; // Increase space between holes
 
     // Magnet effect configuration
     this.MAGNET_THRESHOLD = 50; // Distance in pixels to trigger magnet effect
     this.MAGNET_SPEED = 0.2; // Speed of magnetic snap (0-1)
+
+    // Shape colors for highlighting
+    this.shapeColors = {
+      moon: "#45B7D1", // blue
+      star: "#FF69B4", // pink
+      circle: "#FFD700", // yellow
+      diamond: "#50C878", // green
+      x: "#FFA500", // orange
+    };
 
     this.tableImage = new Image();
     this.shapeImages = {
@@ -85,15 +95,16 @@ class ColorwoodGame {
 
     // Calculate hole dimensions based on cube size and scale
     const holeWidth = this.CUBE_WIDTH * scale;
-    const holeSpacing = 15 * scale; // Slightly increased spacing
-    const totalHolesWidth = this.HOLE_COUNT * holeWidth + (this.HOLE_COUNT - 1) * holeSpacing;
+    // Increase spacing between holes
+    const holeSpacing = (this.CUBE_WIDTH * this.HOLE_SPACING_MULTIPLIER - this.CUBE_WIDTH) * scale;
+    const totalHolesWidth = this.HOLE_COUNT * (holeWidth + holeSpacing) - holeSpacing;
     const startX = (this.canvas.width - totalHolesWidth) / 2;
 
     // Calculate hole height to accommodate 16 cubes with adjusted overlap
-    const holeHeight = this.CUBE_HEIGHT * this.MAX_STACK_SIZE * 0.3 * scale; // 30% overlap
+    const holeHeight = this.CUBE_HEIGHT * this.MAX_STACK_SIZE * 0.3 * scale;
     const startY = this.canvas.height - holeHeight - this.BOTTOM_MARGIN * scale;
 
-    // Initialize holes
+    // Initialize holes with adjusted spacing
     this.holes = [];
     for (let i = 0; i < this.HOLE_COUNT; i++) {
       this.holes.push({
@@ -185,13 +196,11 @@ class ColorwoodGame {
       hole.shapes.forEach((shape, index) => {
         const img = this.shapeImages[shape.type].img;
         let x = hole.x + (hole.width - shape.width) / 2;
-        let y = hole.y + hole.height - (index + 1) * (shape.height * 0.7); // Reduced overlap
+        let y = hole.y + hole.height - (index + 1) * (shape.height * 0.7);
 
         // If this shape is being dragged, use the dragged position
         if (this.isDragging && holeIndex === this.selectedHoleIndex && index >= hole.shapes.length - this.selectedGroupSize) {
           const dragIndex = index - (hole.shapes.length - this.selectedGroupSize);
-
-          // Adjust cursor position to center of shape
           x = this.dragStartX + this.dragOffsetX - shape.width / 2;
           y = this.dragStartY + this.dragOffsetY - shape.height / 2 - dragIndex * shape.height * 0.7;
 
@@ -212,16 +221,16 @@ class ColorwoodGame {
         const isHoverable = this.isShapeSelectable(holeIndex, index);
         const isHovered = holeIndex === this.hoveredHoleIndex && index === this.hoveredShapeIndex && isHoverable && !this.isDragging;
 
-        if (isHovered) {
+        if (isHovered || isInSelectedGroup) {
           this.ctx.save();
-          this.ctx.shadowColor = "#ffff00";
-          this.ctx.shadowBlur = 15;
-        }
-
-        if (isInSelectedGroup) {
-          this.ctx.save();
-          this.ctx.shadowColor = "#fff";
-          this.ctx.shadowBlur = 20;
+          // Use shape's color for glow effect
+          this.ctx.shadowColor = this.shapeColors[shape.type];
+          this.ctx.shadowBlur = isInSelectedGroup ? 25 : 20;
+          // Add white inner glow for selected group
+          if (isInSelectedGroup) {
+            this.ctx.shadowColor = "#ffffff";
+            this.ctx.shadowBlur = 15;
+          }
         }
 
         this.ctx.drawImage(img, x, y, shape.width, shape.height);
