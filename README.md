@@ -38,6 +38,24 @@ bun run dev
 bun run build
 ```
 
+## Playing the Full Game
+
+The repository includes both a demo version and the complete game. To play the full version:
+
+1. Open `src/js/index.js`
+2. Change the import statement from:
+```javascript
+import ColorwoodGame from "./js/game-interview.js";
+```
+to:
+```javascript
+import ColorwoodGame from "./js/fullgame.js";
+```
+3. Run the development server:
+```bash
+bun run dev
+```
+
 ## Customization
 
 The banner can be easily customized by modifying:
