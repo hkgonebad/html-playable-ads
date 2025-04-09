@@ -72,10 +72,29 @@ This implementation follows industry best practices for HTML5 banners:
 - Performance monitoring
 - Accessibility considerations
 
+## Attribution and Disclaimer
+
+This project is a web implementation inspired by the mobile game "Colorwood Sort Puzzle Game" by [Burny Games](https://play.google.com/store/apps/details?id=games.burny.color.sort.woody.puzzle). 
+
+**Important Notice:**
+- This is a demonstration project created for educational and portfolio purposes
+- The original game assets, name "Colorwood", and related intellectual property belong to Burny Games
+- This implementation is not affiliated with, authorized, maintained, sponsored, or endorsed by Burny Games
+- For the official game experience, please download the original [Colorwood Sort Puzzle Game](https://play.google.com/store/apps/details?id=games.burny.color.sort.woody.puzzle) from the Google Play Store
+
 ## About
 
 As a developer passionate about creating engaging web experiences, I specialize in building interactive web content and advertising solutions. This project is part of my ongoing work in web development and digital advertising technologies.
 
 ## License
 
-MIT License - feel free to use this code for your own projects. 
+This project is for educational and portfolio purposes only. The code is provided as-is, without any warranty. 
+
+**Important License Notice:**
+- The code structure and implementation are available for learning purposes
+- The game assets, name "Colorwood", and related intellectual property are the property of Burny Games
+- This project should not be used for commercial purposes
+- Any commercial use of this code or assets may violate copyright laws
+- For commercial use, please obtain proper licenses from the respective owners
+
+For the official game and assets, please visit [Colorwood Sort Puzzle Game](https://play.google.com/store/apps/details?id=games.burny.color.sort.woody.puzzle) on Google Play Store. 
