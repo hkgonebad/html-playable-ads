@@ -1,3 +1,10 @@
+import tableImage from "../img/table.png";
+import moonImage from "../img/moon_blue.png";
+import starImage from "../img/star_pink.png";
+import circleImage from "../img/circle_yellow.png";
+import diamondImage from "../img/diamond_green.png";
+import xImage from "../img/x_orange.png";
+
 class ColorwoodGameInterview {
   constructor(canvas) {
     // console.log("Game constructor called");
@@ -85,20 +92,40 @@ class ColorwoodGameInterview {
     this.introSubtextOpacity = 0;
 
     this.loadAssets();
-    this.tableImage.onload = () => {
-      //console.log("Table image loaded, initializing game");
-      this.init();
-    };
   }
 
   loadAssets() {
-    //console.log("Loading assets");
-    this.tableImage.src = "/src/img/table.png";
-    this.shapeImages.moon.img.src = "/src/img/moon_blue.png";
-    this.shapeImages.star.img.src = "/src/img/star_pink.png";
-    this.shapeImages.circle.img.src = "/src/img/circle_yellow.png";
-    this.shapeImages.diamond.img.src = "/src/img/diamond_green.png";
-    this.shapeImages.x.img.src = "/src/img/x_orange.png";
+    // Create a promise array to track all image loads
+    const imageLoadPromises = [];
+
+    // Load table image
+    const tablePromise = new Promise((resolve) => {
+      this.tableImage.onload = () => resolve();
+      this.tableImage.src = tableImage;
+    });
+    imageLoadPromises.push(tablePromise);
+
+    // Load shape images
+    const shapeTypes = ["moon", "star", "circle", "diamond", "x"];
+    const shapeImages = [moonImage, starImage, circleImage, diamondImage, xImage];
+
+    shapeTypes.forEach((type, index) => {
+      const promise = new Promise((resolve) => {
+        this.shapeImages[type].img.onload = () => resolve();
+        this.shapeImages[type].img.src = shapeImages[index];
+      });
+      imageLoadPromises.push(promise);
+    });
+
+    // Wait for all images to load before initializing
+    Promise.all(imageLoadPromises)
+      .then(() => {
+        console.log("All images loaded successfully");
+        this.init();
+      })
+      .catch((error) => {
+        console.error("Error loading images:", error);
+      });
   }
 
   init(preserveState = true) {
@@ -292,8 +319,12 @@ class ColorwoodGameInterview {
     // Draw table
     this.ctx.drawImage(this.tableImage, 0, 0, this.canvas.width, this.canvas.height);
 
-    // Draw reset button
-    this.renderResetButton();
+    // Update timer display
+    const remainingTime = Math.max(0, Math.ceil((this.INTRO_DURATION + this.GAMEPLAY_DURATION - this.currentTime) / 1000));
+    const timerElement = document.getElementById("gameTimer");
+    if (timerElement) {
+      timerElement.textContent = `Time: ${remainingTime}s`;
+    }
 
     // Draw holes and shapes
     // First pass: Draw all non-dragged shapes
@@ -364,15 +395,6 @@ class ColorwoodGameInterview {
         }
       });
     }
-
-    // Show remaining time
-    const remainingTime = Math.max(0, Math.ceil((this.INTRO_DURATION + this.GAMEPLAY_DURATION - this.currentTime) / 1000));
-    this.ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
-    this.ctx.fillRect(10, 10, 100, 30);
-    this.ctx.fillStyle = "#ffffff";
-    this.ctx.font = `${16 * (this.canvas.width / this.originalWidth)}px Arial`;
-    this.ctx.textAlign = "left";
-    this.ctx.fillText(`Time: ${remainingTime}s`, 20, 30);
   }
 
   renderCTA() {
@@ -391,45 +413,21 @@ class ColorwoodGameInterview {
     }
   }
 
-  renderResetButton() {
-    const buttonSize = 40;
-    const padding = 10;
-    const x = this.canvas.width - buttonSize - padding;
-    const y = padding;
-
-    // Draw button background
-    this.ctx.fillStyle = "#4CAF50";
-    this.ctx.beginPath();
-    this.ctx.arc(x + buttonSize / 2, y + buttonSize / 2, buttonSize / 2, 0, Math.PI * 2);
-    this.ctx.fill();
-
-    // Draw reset icon
-    this.ctx.strokeStyle = "white";
-    this.ctx.lineWidth = 3;
-    this.ctx.beginPath();
-    // Draw circular arrow
-    const radius = buttonSize / 3;
-    this.ctx.arc(x + buttonSize / 2, y + buttonSize / 2, radius, -0.5 * Math.PI, 1.5 * Math.PI);
-    // Draw arrowhead
-    this.ctx.moveTo(x + buttonSize / 2 - radius, y + buttonSize / 2);
-    this.ctx.lineTo(x + buttonSize / 2 - radius - 5, y + buttonSize / 2 - 5);
-    this.ctx.moveTo(x + buttonSize / 2 - radius, y + buttonSize / 2);
-    this.ctx.lineTo(x + buttonSize / 2 - radius + 5, y + buttonSize / 2 - 5);
-    this.ctx.stroke();
-  }
-
   handleResetClick(x, y) {
-    const buttonSize = 40;
-    const padding = 10;
-    const buttonX = this.canvas.width - buttonSize - padding;
-    const buttonY = padding;
+    // Check if the click is on the reset button
+    const resetButton = document.getElementById("resetButton");
+    if (resetButton) {
+      const rect = resetButton.getBoundingClientRect();
+      const canvasRect = this.canvas.getBoundingClientRect();
 
-    // Check if click is within the circular button
-    const distance = Math.sqrt(Math.pow(x - (buttonX + buttonSize / 2), 2) + Math.pow(y - (buttonY + buttonSize / 2), 2));
+      // Convert canvas coordinates to screen coordinates
+      const screenX = x + canvasRect.left;
+      const screenY = y + canvasRect.top;
 
-    if (distance <= buttonSize / 2) {
-      this.resetGame();
-      return true;
+      if (screenX >= rect.left && screenX <= rect.right && screenY >= rect.top && screenY <= rect.bottom) {
+        this.resetGame();
+        return true;
+      }
     }
     return false;
   }

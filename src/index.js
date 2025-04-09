@@ -45,6 +45,13 @@ document.addEventListener("DOMContentLoaded", () => {
     window.open("https://play.google.com/store/apps/details?id=games.burny.color.sort.woody.puzzle&hl=en-US", "_blank");
   });
 
+  // Add event listener for the reset button
+  document.getElementById("resetButton").addEventListener("click", () => {
+    if (game.gameState === "gameplay") {
+      game.resetGame();
+    }
+  });
+
   // Add event listener for the intro overlay
   document.getElementById("introOverlay").addEventListener("click", () => {
     if (game.gameState === "intro") {
