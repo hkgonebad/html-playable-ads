@@ -1,65 +1,204 @@
+/* Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  overflow: hidden;
+  touch-action: none;
+  background: #f0f0f0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+/* Game Container */
 .game-container {
-  position: relative;
-  width: 100vw;
+  width: 100%;
+  max-width: 600px;
   height: 100vh;
+  max-height: 100vh;
+  position: relative;
   overflow: hidden;
 }
 
-.intro-text {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  color: #333;
-  font-family: Arial, sans-serif;
+#gameCanvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #fff;
 }
 
-.intro-text h1 {
-  font-size: 3rem;
-  margin-bottom: 1rem;
+@media (min-width: 601px) {
+  .game-container {
+    height: 100vh;
+    max-height: 100vh;
+  }
+}
+
+/* Intro Styles */
+.intro-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.intro-container {
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+}
+
+.intro-title {
+  color: white;
+  font-size: 48px;
+  font-family: Arial, sans-serif;
+  margin-bottom: 20px;
   animation: fadeIn 1s ease-in;
 }
 
-.intro-text p {
-  font-size: 1.5rem;
-  opacity: 0;
+.intro-subtext {
+  color: white;
+  font-size: 24px;
+  font-family: Arial, sans-serif;
+  margin-bottom: 30px;
   animation: fadeIn 1s ease-in 0.5s forwards;
+  opacity: 0;
+}
+
+.tap-to-play {
+  color: white;
+  font-size: 20px;
+  font-family: Arial, sans-serif;
+  margin-top: 20px;
+  animation: pulse 2s infinite;
+}
+
+/* CTA Styles */
+.cta-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  display: none;
+  /* Hidden by default */
+}
+
+.cta-container {
+  background-color: rgba(0, 0, 0, 0.7);
+  border-radius: 20px;
+  padding: 30px;
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+}
+
+.cta-title {
+  color: white;
+  font-size: 48px;
+  font-family: Arial, sans-serif;
+  margin-bottom: 20px;
+  animation: pulse 2s infinite;
 }
 
 .cta-button {
-  position: absolute;
-  bottom: 2rem;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 1rem 2rem;
-  background: #4caf50;
+  background: linear-gradient(to bottom, #4caf50, #388e3c);
   color: white;
-  border: none;
-  border-radius: 25px;
-  font-size: 1.2rem;
+  border: 3px solid white;
+  border-radius: 15px;
+  padding: 15px 30px;
+  font-size: 24px;
   cursor: pointer;
-  transition: transform 0.2s, background 0.2s;
-  opacity: 0;
-  animation: fadeIn 0.5s ease-in 1s forwards;
+  margin: 20px 0;
+  width: 100%;
+  max-width: 300px;
+  animation: pulse 2s infinite;
 }
 
-.cta-button:hover {
-  transform: translateX(-50%) scale(1.1);
-  background: #45a049;
+.cta-subtext {
+  color: #ffeb3b;
+  font-size: 16px;
+  margin-top: 10px;
+  animation: fade 2s infinite;
 }
 
+/* Interview Page Styles */
+.interview-body {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f0f0f0;
+  overflow: hidden;
+}
+
+.interview-canvas {
+  max-width: 100%;
+  max-height: 100vh;
+  touch-action: none;
+}
+
+/* Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes fade {
+  0% {
+    opacity: 0.7;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.1;
+  }
+}
+
+/* Game Elements */
 .block {
   position: absolute;
   border-radius: 8px;
@@ -74,4 +213,18 @@
 .block.dragging {
   z-index: 1000;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 600px) {
+  .cta-container {
+    max-width: 300px;
+  }
+
+  .cta-title {
+    font-size: 36px;
+  }
+
+  .cta-button {
+    font-size: 20px;
+  }
 }

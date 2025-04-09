@@ -3,207 +3,26 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Colorwood Sort - Playable Ad</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      overflow: hidden;
-      touch-action: none;
-      background: #f0f0f0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-    }
-
-    .game-container {
-      width: 100%;
-      max-width: 600px;
-      height: 100vh;
-      max-height: 100vh;
-      position: relative;
-      overflow: hidden;
-    }
-
-    #gameCanvas {
-      display: block;
-      width: 100%;
-      height: 100%;
-      background: #fff;
-    }
-
-    @media (min-width: 601px) {
-      .game-container {
-        height: 100vh;
-        max-height: 100vh;
-      }
-    }
-
-    /* Intro Styles */
-    .intro-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      z-index: 10;
-      background-color: rgba(0, 0, 0, 0.7);
-    }
-
-    .intro-container {
-      text-align: center;
-      max-width: 400px;
-      width: 90%;
-    }
-
-    .intro-title {
-      color: white;
-      font-size: 48px;
-      font-family: Arial, sans-serif;
-      margin-bottom: 20px;
-      animation: fadeIn 1s ease-in;
-    }
-
-    .intro-subtext {
-      color: white;
-      font-size: 24px;
-      font-family: Arial, sans-serif;
-      margin-bottom: 30px;
-      animation: fadeIn 1s ease-in 0.5s forwards;
-      opacity: 0;
-    }
-
-    .tap-to-play {
-      color: white;
-      font-size: 20px;
-      font-family: Arial, sans-serif;
-      margin-top: 20px;
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* CTA Styles */
-    .cta-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      z-index: 10;
-      display: none;
-      /* Hidden by default */
-    }
-
-    .cta-container {
-      background-color: rgba(0, 0, 0, 0.7);
-      border-radius: 20px;
-      padding: 30px;
-      text-align: center;
-      max-width: 400px;
-      width: 90%;
-    }
-
-    .cta-title {
-      color: white;
-      font-size: 48px;
-      font-family: Arial, sans-serif;
-      margin-bottom: 20px;
-      animation: pulse 2s infinite;
-    }
-
-    .cta-button {
-      background: linear-gradient(to bottom, #4CAF50, #388E3C);
-      color: white;
-      border: 3px solid white;
-      border-radius: 15px;
-      padding: 15px 30px;
-      font-size: 24px;
-      font-family: Arial, sans-serif;
-      cursor: pointer;
-      margin: 20px 0;
-      width: 100%;
-      max-width: 300px;
-      animation: pulse 2s infinite;
-    }
-
-    .cta-subtext {
-      color: rgba(255, 255, 255, 0.7);
-      font-size: 18px;
-      font-family: Arial, sans-serif;
-      margin-top: 10px;
-      animation: fade 2s infinite;
-    }
-
-    @keyframes pulse {
-      0% {
-        transform: scale(1);
-      }
-
-      50% {
-        transform: scale(1.05);
-      }
-
-      100% {
-        transform: scale(1);
-      }
-    }
-
-    @keyframes fade {
-      0% {
-        opacity: 0.5;
-      }
-
-      50% {
-        opacity: 1;
-      }
-
-      100% {
-        opacity: 0.5;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="src/css/style.css">
 </head>
 
 <body>
   <div class="game-container">
     <canvas id="gameCanvas"></canvas>
-    <div class="intro-overlay" id="introOverlay">
+    <div id="introOverlay" class="intro-overlay">
       <div class="intro-container">
         <h1 class="intro-title">Sort the shapes!</h1>
         <p class="intro-subtext">Stack 16 same shapes to clear them</p>
         <p class="tap-to-play">Tap to play!</p>
       </div>
     </div>
-    <div class="cta-overlay" id="ctaOverlay">
+    <div id="ctaOverlay" class="cta-overlay">
       <div class="cta-container">
-        <h1 class="cta-title">Play Now!</h1>
-        <button class="cta-button" id="ctaButton">Download Now!</button>
-        <p class="cta-subtext">Tap to download</p>
+        <h1 class="cta-title">Download Now!</h1>
+        <button id="ctaButton" class="cta-button">Download Now</button>
+        <p class="cta-subtext">Tap to download the full game</p>
       </div>
     </div>
   </div>
