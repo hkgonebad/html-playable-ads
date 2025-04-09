@@ -35,14 +35,14 @@ document.addEventListener("DOMContentLoaded", () => {
       const buttonY = game.canvas.height / 2 + 20 * scale;
 
       if (x >= buttonX && x <= buttonX + buttonWidth && y >= buttonY && y <= buttonY + buttonHeight) {
-        window.open("https://play.google.com/store/apps/details?id=com.colorwood.sort.puzzle", "_blank");
+        window.open("https://play.google.com/store/apps/details?id=games.burny.color.sort.woody.puzzle&hl=en-US", "_blank");
       }
     }
   });
 
   // Add event listener for the HTML CTA button
   document.getElementById("ctaButton").addEventListener("click", () => {
-    window.open("https://play.google.com/store/apps/details?id=com.colorwood.sort.puzzle", "_blank");
+    window.open("https://play.google.com/store/apps/details?id=games.burny.color.sort.woody.puzzle&hl=en-US", "_blank");
   });
 
   // Add event listener for the intro overlay

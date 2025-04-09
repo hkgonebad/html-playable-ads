@@ -1,6 +1,6 @@
 class ColorwoodGameInterview {
   constructor(canvas) {
-    console.log("Game constructor called");
+    // console.log("Game constructor called");
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d");
     this.holes = [];
@@ -86,13 +86,13 @@ class ColorwoodGameInterview {
 
     this.loadAssets();
     this.tableImage.onload = () => {
-      console.log("Table image loaded, initializing game");
+      //console.log("Table image loaded, initializing game");
       this.init();
     };
   }
 
   loadAssets() {
-    console.log("Loading assets");
+    //console.log("Loading assets");
     this.tableImage.src = "/src/img/table.png";
     this.shapeImages.moon.img.src = "/src/img/moon_blue.png";
     this.shapeImages.star.img.src = "/src/img/star_pink.png";
@@ -102,7 +102,7 @@ class ColorwoodGameInterview {
   }
 
   init(preserveState = true) {
-    console.log("Game init called, window width:", window.innerWidth);
+    //console.log("Game init called, window width:", window.innerWidth);
 
     // Get the container width (max 600px)
     const container = this.canvas.parentElement;
@@ -111,7 +111,7 @@ class ColorwoodGameInterview {
 
     // Calculate scale based on target width
     const scale = targetWidth / this.originalWidth;
-    console.log("Target width:", targetWidth, "Scale:", scale);
+    //console.log("Target width:", targetWidth, "Scale:", scale);
 
     // Store current state if preserving
     const previousHoles = preserveState ? this.holes : null;
@@ -119,29 +119,29 @@ class ColorwoodGameInterview {
     // Set canvas size maintaining aspect ratio
     this.canvas.width = targetWidth;
     this.canvas.height = this.originalHeight * scale;
-    console.log("Canvas dimensions set to:", this.canvas.width, "x", this.canvas.height);
+    //console.log("Canvas dimensions set to:", this.canvas.width, "x", this.canvas.height);
 
     // Center canvas using margin instead of absolute positioning
     this.canvas.style.position = "relative";
     this.canvas.style.margin = "0 auto";
     this.canvas.style.display = "block";
-    console.log("Canvas centered using margin: auto");
+    //console.log("Canvas centered using margin: auto");
 
     // Calculate hole dimensions based on cube size and scale
     const holeWidth = this.CUBE_WIDTH * scale;
     const holeSpacing = (this.CUBE_WIDTH * this.HOLE_SPACING_MULTIPLIER - this.CUBE_WIDTH) * scale;
     const totalHolesWidth = this.HOLE_COUNT * (holeWidth + holeSpacing) - holeSpacing;
     const startX = (this.canvas.width - totalHolesWidth) / 2;
-    console.log("Hole dimensions:", holeWidth, "Spacing:", holeSpacing, "Start X:", startX);
+    //console.log("Hole dimensions:", holeWidth, "Spacing:", holeSpacing, "Start X:", startX);
 
     // Calculate hole height - adjust to position cubes lower on the table
     const holeHeight = this.CUBE_HEIGHT * this.MAX_STACK_SIZE * 0.3 * scale;
     const startY = this.canvas.height - holeHeight - (this.BOTTOM_MARGIN - 40) * scale; // Adjusted to move cubes down more
-    console.log("Hole height:", holeHeight, "Start Y:", startY);
+    //console.log("Hole height:", holeHeight, "Start Y:", startY);
 
     // Initialize or update holes
     if (preserveState && previousHoles && previousHoles.length > 0) {
-      console.log("Updating existing holes");
+      //console.log("Updating existing holes");
       // Update existing holes with new positions while preserving shapes
       this.holes = previousHoles.map((hole, i) => ({
         x: startX + i * (holeWidth + holeSpacing),
@@ -155,7 +155,7 @@ class ColorwoodGameInterview {
         })),
       }));
     } else {
-      console.log("Creating new holes");
+      //console.log("Creating new holes");
       // Create new holes
       this.holes = Array(this.HOLE_COUNT)
         .fill(null)
@@ -173,7 +173,7 @@ class ColorwoodGameInterview {
 
     // Start game loop if not already started
     if (!this.startTime) {
-      console.log("Starting game loop");
+      //console.log("Starting game loop");
       this.startTime = Date.now();
       this.introStartTime = this.startTime;
       this.gameplayStartTime = this.introStartTime + this.INTRO_DURATION;
@@ -183,7 +183,7 @@ class ColorwoodGameInterview {
   }
 
   distributeShapesRandomly() {
-    console.log("Distributing shapes randomly");
+    //console.log("Distributing shapes randomly");
     const allShapes = [];
     const types = ["moon", "star", "circle", "diamond", "x"];
 
@@ -219,15 +219,15 @@ class ColorwoodGameInterview {
         }
       }
     }
-    console.log("Shapes distributed to holes");
+    //console.log("Shapes distributed to holes");
 
     // Debug: Check if shapes were distributed correctly
     let totalShapes = 0;
     this.holes.forEach((hole, index) => {
-      console.log(`Hole ${index} has ${hole.shapes.length} shapes`);
+      //console.log(`Hole ${index} has ${hole.shapes.length} shapes`);
       totalShapes += hole.shapes.length;
     });
-    console.log(`Total shapes distributed: ${totalShapes}`);
+    //console.log(`Total shapes distributed: ${totalShapes}`);
   }
 
   gameLoop() {
@@ -244,6 +244,13 @@ class ColorwoodGameInterview {
     } else if (this.gameState === "gameplay" || (this.gameState === "intro" && currentTime >= this.INTRO_DURATION)) {
       this.gameState = "gameplay"; // Ensure we're in gameplay state
       this.renderGameplay();
+
+      // Check if gameplay duration has ended
+      if (currentTime >= this.INTRO_DURATION + this.GAMEPLAY_DURATION) {
+        this.gameState = "cta";
+        this.ctaTriggered = true;
+        this.renderCTA();
+      }
     } else if (this.gameState === "cta" || (this.hasInteracted && !this.ctaTriggered && currentTime > this.INTRO_DURATION)) {
       this.gameState = "cta";
       this.ctaTriggered = true;
@@ -428,7 +435,7 @@ class ColorwoodGameInterview {
   }
 
   resetGame() {
-    console.log("Resetting game");
+    //console.log("Resetting game");
     // Clear all holes
     this.holes.forEach((hole) => {
       hole.shapes = [];
@@ -461,12 +468,14 @@ class ColorwoodGameInterview {
         for (let shapeIndex = hole.shapes.length - 1; shapeIndex >= 0; shapeIndex--) {
           const shape = hole.shapes[shapeIndex];
           const shapeX = hole.x + (hole.width - shape.width) / 2;
-          const shapeY = hole.y + hole.height - (shapeIndex + 1) * (shape.height * 0.75);
+          const shapeY = hole.y + hole.height - (shapeIndex + 1) * (shape.height * 0.8);
 
-          // Improved hit detection - check if point is within the shape's bounds
-          // Add a small buffer zone around the shape for easier selection
-          const buffer = 5 * (this.canvas.width / this.originalWidth);
-          if (x >= shapeX - buffer && x <= shapeX + shape.width + buffer && y >= shapeY - buffer && y <= shapeY + shape.height + buffer) {
+          // Improved hit detection with balanced buffer zones
+          // Use a larger buffer for top and bottom to make selection more intuitive
+          const horizontalBuffer = 5 * (this.canvas.width / this.originalWidth);
+          const verticalBuffer = 15 * (this.canvas.width / this.originalWidth); // Larger vertical buffer
+
+          if (x >= shapeX - horizontalBuffer && x <= shapeX + shape.width + horizontalBuffer && y >= shapeY - verticalBuffer && y <= shapeY + shape.height + verticalBuffer) {
             if (this.isShapeSelectable(holeIndex, shapeIndex)) {
               return { holeIndex, shapeIndex };
             }
@@ -768,7 +777,7 @@ class ColorwoodGameInterview {
       // Redirect to app store or trigger download
       console.log("CTA button clicked, redirecting to app store");
       // In a real implementation, this would redirect to the app store
-      // window.location.href = "https://play.google.com/store/apps/details?id=com.example.game";
+      // window.location.href = "https://play.google.com/store/apps/details?id=games.burny.color.sort.woody.puzzle&hl=en-US";
       return true;
     }
 
