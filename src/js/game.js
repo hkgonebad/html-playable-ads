@@ -100,15 +100,11 @@ class ColorwoodGame {
     this.canvas.height = this.originalHeight * scale;
     console.log("Canvas dimensions set to:", this.canvas.width, "x", this.canvas.height);
 
-    // Center canvas
-    this.canvas.style.position = "absolute";
-    if (window.innerWidth > this.canvas.width) {
-      this.canvas.style.left = `${(window.innerWidth - this.canvas.width) / 2}px`;
-    } else {
-      this.canvas.style.left = "0";
-    }
-    this.canvas.style.top = "0";
-    console.log("Canvas positioned at:", this.canvas.style.left, this.canvas.style.top);
+    // Center canvas using margin instead of absolute positioning
+    this.canvas.style.position = "relative";
+    this.canvas.style.margin = "0 auto";
+    this.canvas.style.display = "block";
+    console.log("Canvas centered using margin: auto");
 
     // Calculate hole dimensions based on cube size and scale
     const holeWidth = this.CUBE_WIDTH * scale;
@@ -117,9 +113,9 @@ class ColorwoodGame {
     const startX = (this.canvas.width - totalHolesWidth) / 2;
     console.log("Hole dimensions:", holeWidth, "Spacing:", holeSpacing, "Start X:", startX);
 
-    // Calculate hole height
+    // Calculate hole height - adjust to position cubes lower on the table
     const holeHeight = this.CUBE_HEIGHT * this.MAX_STACK_SIZE * 0.3 * scale;
-    const startY = this.canvas.height - holeHeight - this.BOTTOM_MARGIN * scale;
+    const startY = this.canvas.height - holeHeight - (this.BOTTOM_MARGIN - 40) * scale; // Adjusted to move cubes down more
     console.log("Hole height:", holeHeight, "Start Y:", startY);
 
     // Initialize or update holes
@@ -243,56 +239,76 @@ class ColorwoodGame {
 
     // Draw holes and shapes
     console.log("Number of holes:", this.holes.length);
+
+    // First pass: Draw all non-dragged shapes
     this.holes.forEach((hole, holeIndex) => {
       console.log(`Hole ${holeIndex} has ${hole.shapes.length} shapes`);
       hole.shapes.forEach((shape, index) => {
+        // Skip shapes that are being dragged
+        if (this.isDragging && holeIndex === this.selectedHoleIndex && index >= hole.shapes.length - this.selectedGroupSize) {
+          return;
+        }
+
         const img = this.shapeImages[shape.type].img;
         let x = hole.x + (hole.width - shape.width) / 2;
         let y = hole.y + hole.height - (index + 1) * (shape.height * 0.75);
 
-        // If this shape is being dragged, use the dragged position
-        if (this.isDragging && holeIndex === this.selectedHoleIndex && index >= hole.shapes.length - this.selectedGroupSize) {
-          const dragIndex = index - (hole.shapes.length - this.selectedGroupSize);
-          x = this.dragStartX + this.dragOffsetX - shape.width / 2;
-          y = this.dragStartY + this.dragOffsetY - shape.height / 2 - dragIndex * shape.height * 0.75;
-
-          // Apply magnet effect
-          const nearestHole = this.findNearestValidHole(x + shape.width / 2, y + shape.height / 2);
-          if (nearestHole !== null) {
-            const targetX = nearestHole.x + (nearestHole.width - shape.width) / 2;
-            const targetY = nearestHole.y + nearestHole.height - (nearestHole.shapes.length + dragIndex + 1) * shape.height * 0.75;
-
-            x = x + (targetX - x) * this.MAGNET_SPEED;
-            y = y + (targetY - y) * this.MAGNET_SPEED;
-          }
-        }
-
         // Only highlight if this shape is specifically selected/hovered
-        const isInSelectedGroup = this.isDragging && holeIndex === this.selectedHoleIndex && index >= hole.shapes.length - this.selectedGroupSize;
-
         const isHoverable = this.isShapeSelectable(holeIndex, index);
         const isHovered = holeIndex === this.hoveredHoleIndex && index === this.hoveredShapeIndex && isHoverable && !this.isDragging;
 
-        if (isHovered || isInSelectedGroup) {
+        if (isHovered) {
           this.ctx.save();
           // Use shape's color for glow effect
           this.ctx.shadowColor = this.shapeColors[shape.type];
-          this.ctx.shadowBlur = isInSelectedGroup ? 20 : 15;
-          // Add white inner glow for selected group
-          if (isInSelectedGroup) {
-            this.ctx.shadowColor = "#ffffff";
-            this.ctx.shadowBlur = 15;
-          }
+          this.ctx.shadowBlur = 15;
         }
 
         // Draw the shape
         this.ctx.drawImage(img, x, y, shape.width, shape.height);
 
-        if (isHovered || isInSelectedGroup) {
+        if (isHovered) {
           this.ctx.restore();
         }
       });
     });
+
+    // Second pass: Draw dragged shapes on top
+    if (this.isDragging) {
+      this.holes.forEach((hole, holeIndex) => {
+        if (holeIndex === this.selectedHoleIndex) {
+          hole.shapes.forEach((shape, index) => {
+            if (index >= hole.shapes.length - this.selectedGroupSize) {
+              const dragIndex = index - (hole.shapes.length - this.selectedGroupSize);
+              const img = this.shapeImages[shape.type].img;
+
+              let x = this.dragStartX + this.dragOffsetX - shape.width / 2;
+              let y = this.dragStartY + this.dragOffsetY - shape.height / 2 - dragIndex * shape.height * 0.75;
+
+              // Apply magnet effect
+              const nearestHole = this.findNearestValidHole(x + shape.width / 2, y + shape.height / 2);
+              if (nearestHole !== null) {
+                const targetX = nearestHole.x + (nearestHole.width - shape.width) / 2;
+                const targetY = nearestHole.y + nearestHole.height - (nearestHole.shapes.length + dragIndex + 1) * shape.height * 0.75;
+
+                x = x + (targetX - x) * this.MAGNET_SPEED;
+                y = y + (targetY - y) * this.MAGNET_SPEED;
+              }
+
+              // Highlight selected group
+              this.ctx.save();
+              this.ctx.shadowColor = "#ffffff";
+              this.ctx.shadowBlur = 20;
+
+              // Draw the shape
+              this.ctx.drawImage(img, x, y, shape.width, shape.height);
+
+              this.ctx.restore();
+            }
+          });
+        }
+      });
+    }
   }
 
   renderCTA() {
