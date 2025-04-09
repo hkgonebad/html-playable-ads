@@ -3,32 +3,35 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Colorwood Sort - Playable Ad</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      overflow: hidden;
-      touch-action: none;
-      background: #f0f0f0;
-    }
-
-    #gameCanvas {
-      display: block;
-      width: 100vw;
-      height: 100vh;
-      background: #fff;
-    }
-  </style>
+  <link rel="stylesheet" href="src/css/style.css">
 </head>
 
 <body>
-  <canvas id="gameCanvas"></canvas>
+  <div class="game-container">
+    <div id="gameTimer" class="game-timer">Time: 30s</div>
+    <button id="resetButton" class="reset-button">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z" fill="white" />
+      </svg>
+    </button>
+    <canvas id="gameCanvas"></canvas>
+    <div id="introOverlay" class="intro-overlay">
+      <div class="intro-container">
+        <h1 class="intro-title">Sort the shapes!</h1>
+        <p class="intro-subtext">Stack 16 same shapes to clear them</p>
+        <p class="tap-to-play">Tap to play!</p>
+      </div>
+    </div>
+    <div id="ctaOverlay" class="cta-overlay">
+      <div class="cta-container">
+        <h1 class="cta-title">Download Now!</h1>
+        <button id="ctaButton" class="cta-button">Download Now</button>
+        <p class="cta-subtext">Tap to download the full game</p>
+      </div>
+    </div>
+  </div>
   <script type="module" src="/src/index.js"></script>
 </body>
 

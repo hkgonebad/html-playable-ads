@@ -111,16 +111,16 @@ class ColorwoodGame {
     const holeSpacing = (this.CUBE_WIDTH * this.HOLE_SPACING_MULTIPLIER - this.CUBE_WIDTH) * scale;
     const totalHolesWidth = this.HOLE_COUNT * (holeWidth + holeSpacing) - holeSpacing;
     const startX = (this.canvas.width - totalHolesWidth) / 2;
-    console.log("Hole dimensions:", holeWidth, "Spacing:", holeSpacing, "Start X:", startX);
+    // console.log("Hole dimensions:", holeWidth, "Spacing:", holeSpacing, "Start X:", startX);
 
     // Calculate hole height - adjust to position cubes lower on the table
     const holeHeight = this.CUBE_HEIGHT * this.MAX_STACK_SIZE * 0.3 * scale;
     const startY = this.canvas.height - holeHeight - (this.BOTTOM_MARGIN - 40) * scale; // Adjusted to move cubes down more
-    console.log("Hole height:", holeHeight, "Start Y:", startY);
+    // console.log("Hole height:", holeHeight, "Start Y:", startY);
 
     // Initialize or update holes
     if (preserveState && previousHoles && previousHoles.length > 0) {
-      console.log("Updating existing holes");
+      // console.log("Updating existing holes");
       // Update existing holes with new positions while preserving shapes
       this.holes = previousHoles.map((hole, i) => ({
         x: startX + i * (holeWidth + holeSpacing),
@@ -134,7 +134,7 @@ class ColorwoodGame {
         })),
       }));
     } else {
-      console.log("Creating new holes");
+      // console.log("Creating new holes");
       // Create new holes
       this.holes = Array(this.HOLE_COUNT)
         .fill(null)
@@ -200,10 +200,10 @@ class ColorwoodGame {
     // Debug: Check if shapes were distributed correctly
     let totalShapes = 0;
     this.holes.forEach((hole, index) => {
-      console.log(`Hole ${index} has ${hole.shapes.length} shapes`);
+      // console.log(`Hole ${index} has ${hole.shapes.length} shapes`);
       totalShapes += hole.shapes.length;
     });
-    console.log(`Total shapes distributed: ${totalShapes}`);
+    // console.log(`Total shapes distributed: ${totalShapes}`);
   }
 
   gameLoop() {
@@ -238,11 +238,11 @@ class ColorwoodGame {
     this.renderResetButton();
 
     // Draw holes and shapes
-    console.log("Number of holes:", this.holes.length);
+    // console.log("Number of holes:", this.holes.length);
 
     // First pass: Draw all non-dragged shapes
     this.holes.forEach((hole, holeIndex) => {
-      console.log(`Hole ${holeIndex} has ${hole.shapes.length} shapes`);
+      // console.log(`Hole ${holeIndex} has ${hole.shapes.length} shapes`);
       hole.shapes.forEach((shape, index) => {
         // Skip shapes that are being dragged
         if (this.isDragging && holeIndex === this.selectedHoleIndex && index >= hole.shapes.length - this.selectedGroupSize) {
